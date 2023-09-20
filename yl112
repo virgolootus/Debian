@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Küsime kasutajalt faili teed ja oodatud õiguseid
+read -p "Sisesta faili tee ja oodatud õigused (nt. /etc/passwd 644): " faili_tee oodatud_oigused
+
+# Kontrollime, kas fail eksisteerib
+if [ -e "$faili_tee" ]; then
+    tegelikud_oigused=$(stat -c %a "$faili_tee")
+    if [ "$tegelikud_oigused" -eq "$oodatud_oigused" ]; then
+        echo "Fail $faili_tee on olemas ja õigustega korrektselt määratud."
+    else
+        echo "Hoiatus: faili $faili_tee õigused on $tegelikud_oigused, peaksid olema $oodatud_oigused!"
+    fi
+else
+    echo "Hoiatus: $faili_tee pole fail!"
+fi
