@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Küsi kasutajalt kasutajanime
+read -p "Sisesta kasutajanimi: " kasutajanimi
+
+# Küsi parooli, trüki kirjutamisel ei kuvata
+read -s -p "Sisesta parool: " parool
+echo
+
+# Vaikimisi grupp "kylaline", kui gruppi ei määrata käsurea argumendina
+grupp="kylaline"
+
+# Kontrolli, kas kasutaja andis grupi nime käsurea argumendina
+if [ $# -eq 1 ]; then
+    grupp="$1"
+fi
+
+# Loome uue kasutaja koos grupiga
+sudo useradd -m -g "$grupp" "$kasutajanimi"
+
+# Määrame parooli uuele kasutajale
+echo "$kasutajanimi:$parool" | sudo chpasswd
+
+# Loome kodukausta sisse faili "teretulemast_kasutajanimi.txt"
+kasutaja_kodu="/home/$kasutajanimi"
+failinimi="teretulemast_$kasutajanimi.txt"
+touch "$kasutaja_kodu/$failinimi"
+
+echo "Kasutaja $kasutajanimi on loodud grupiga $grupp ja kodukaustas on fail $failinimi."
+
+
