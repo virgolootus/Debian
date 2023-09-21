@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# 12.1 - Kuvab /etc/passwd failist ainult kasutajad
+awk -F: '{print $1}' /etc/passwd
+
+# 12.2 - Loo kasutajad vastavalt nimekirjale nimekiri.txt
+while IFS= read -r line; do
+  # Muuda nimed väiketähtedeks ja asenda täpitähed
+  name=$(echo "$line" | tr '[:upper:]' '[:lower:]' | sed 'y/õüäö/ouao/')
+
+  # Tee nimest kasutajanimi (eesnimi.perenimi)
+  username=$(echo "$name" | awk '{print $1 "." $2}')
+
+  # Genereeri parool
+  password=$(date +%s%N${RANDOM}${RANDOM} | sha256sum | head -c12)
+
+  # Lisa kasutaja süsteemi
+  sudo useradd -m -s /bin/bash -p $(echo "$password" | openssl passwd -1 -stdin) "$username"
+
+  # Väljasta kasutajanimi ja parool
+  echo "$username $password"
+done < "nimekiri.txt"
+
