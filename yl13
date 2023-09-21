@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# 13.1 - Funktsioon varundamiseks
+varunda() {
+  if [ -z "$1" ]; then
+    echo "Faili tee puudub."
+    return 1
+  fi
+
+  if [ ! -f "$1" ]; then
+    echo "Faili ei leitud: $1"
+    return 1
+  fi
+
+  # Võta faili tee ja nimi
+  file_path="$1"
+  file_name=$(basename "$file_path")
+
+  # Loome backup'i kausta, kui seda pole
+  backup_dir="${file_path%/*}/backup"
+  mkdir -p "$backup_dir"
+
+  # Koosta backup faili nimi koos kuupäeva ja kellaajaga
+  timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
+  backup_file="$backup_dir/${file_name%.*}_$timestamp.${file_name##*.}"
+
+  # Kopeeri fail backup kausta
+  cp "$file_path" "$backup_file"
+
+  echo "Varundatud: $file_path -> $backup_file"
+}
+
+# 13.2 - Kasutame varunda funktsiooni
+varunda "/home/vlootus/minufail.txt"  # Asenda tee oma faili teega
+
