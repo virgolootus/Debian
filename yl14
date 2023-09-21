@@ -1,0 +1,78 @@
+#!/bin/bash
+
+# Funktsioon paketihalduri andmete uuendamiseks ja tarkvara uuendamiseks
+uuenda_tarkvara() {
+  echo "Uuendan paketihalduri andmeid..."
+  sudo apt update
+
+  echo "Uuendan tarkvara..."
+  sudo apt upgrade -y  # -y laseb automaatselt vastata "yes" kõigile küsimustele
+  if [ $? -eq 0 ]; then
+    echo "Tarkvara uuendatud edukalt."
+  else
+    echo "Tarkvara uuendamine ebaõnnestus."
+  fi
+}
+
+# Funktsioon Apache2 paigaldamiseks ja teenuse käivitamiseks
+paigalda_apache() {
+  if [ -x "$(command -v apache2)" ]; then
+    echo "Apache2 on juba paigaldatud."
+  else
+    echo "Paigaldan Apache2..."
+    sudo apt install apache2 -y
+    if [ $? -eq 0 ]; then
+      echo "Apache2 paigaldatud ja käivitatud edukalt."
+      sudo systemctl start apache2
+    else
+      echo "Apache2 paigaldamine ebaõnnestus."
+    fi
+  fi
+}
+
+# Funktsioon Apache2 eemaldamiseks
+eemalda_apache() {
+  if [ -x "$(command -v apache2)" ]; then
+    echo "Eemaldan Apache2..."
+    sudo systemctl stop apache2
+    sudo apt purge apache2 -y
+    sudo apt autoremove -y
+    if [ $? -eq 0 ]; then
+      echo "Apache2 eemaldatud edukalt."
+    else
+      echo "Apache2 eemaldamine ebaõnnestus."
+    fi
+  else
+    echo "Apache2 ei ole paigaldatud."
+  fi
+}
+
+# Menüü väljastamiseks ja valikute töötlemiseks
+while true; do
+  echo "Valige tegevus:"
+  echo "1. Uuenda paketihalduri andmeid ja tarkvara"
+  echo "2. Paigalda Apache2 tarkvara ja käivita teenus"
+  echo "3. Eemalda Apache2 tarkvara"
+  echo "4. Välju"
+
+  read -p "Sisestage valik ((1)Uuenda Tarkvara/(2)Paigalda Apache/(3)Eemalda Apache/(4)Välju meenyyst): " valik
+
+  case $valik in
+    1)
+      uuenda_tarkvara
+      ;;
+    2)
+      paigalda_apache
+      ;;
+    3)
+      eemalda_apache
+      ;;
+    4)
+      echo "Väljutakse..."
+      exit 0
+      ;;
+    *)
+      echo "Vigane valik. Palun valige 1, 2, 3 või 4."
+      ;;
+  esac
+done
